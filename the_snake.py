@@ -42,7 +42,6 @@ pygame.display.set_caption('Змейка')
 clock = pygame.time.Clock()
 
 
-# Тут опишите все классы игры.
 class GameObject:
     """
     Базовый класс. Cодержит общие атрибуты,
@@ -56,6 +55,29 @@ class GameObject:
     def draw(self):
         """Метод для отрисовки объектов."""
         pass
+
+
+class Stone(GameObject):
+    """Преграда на поле"""
+
+    def __init__(self):
+        super().__init__(body_color=BORDER_COLOR)
+        self.randomize_position()
+
+    def randomize_position(self):
+        """Устанавливаем случайную позицию стенки."""
+        self.position = (
+            randint(0, GRID_WIDTH - 1) * GRID_SIZE,
+            randint(0, GRID_HEIGHT - 1) * GRID_SIZE,
+        )
+        return self.position
+
+    def draw(self, surface):
+        """Задаём цвет камня."""
+        rect = pygame.Rect((self.position[0], self.position[1]),
+                           (GRID_SIZE, GRID_SIZE))
+        pygame.draw.rect(surface, self.body_color, rect)
+        pygame.draw.rect(surface, BORDER_COLOR, rect, 2, 4)
 
 
 class Apple(GameObject):
@@ -180,29 +202,49 @@ def draw_apple():
     return apple
 
 
+def draw_stone():
+    """Отрисовка стены."""
+    stone = Stone()
+    stone.draw(screen)
+    return stone
+
+
 def main():
     """Основная логика игры Змейка."""
     apple = draw_apple()
+    stone = draw_stone()
+    stones = [stone]
 
     snake = Snake()
     snake.draw(screen)
     global SPEED
+
     while True:
         clock.tick(SPEED)
         handle_keys(snake)
         snake.update_direction()
         snake.move()
+        
+        
+        for i in stones:
+            if i.position == snake.get_head_position():
+                SPEED = 7
+                snake.reset()
+                apple = draw_apple()
+                stones = [draw_stone()]
 
         if apple.position == snake.get_head_position():
             snake.length += 1
             SPEED += 0.5
-            print(SPEED)
             apple = draw_apple()
+            if randint(0, 3) == 1:
+                stones.append(draw_stone())
 
         if snake.get_head_position() in snake.positions[1:]:
             SPEED = 7
             snake.reset()
             apple = draw_apple()
+
         snake.draw(screen)
 
         pygame.display.update()
