@@ -44,40 +44,45 @@ clock = pygame.time.Clock()
 
 # Тут опишите все классы игры.
 class GameObject:
-    '''Базовый класс. Cодержит общие атрибуты и метод отрисовки игровых объектов.'''
+    """
+    Базовый класс. Cодержит общие атрибуты,
+    метод отрисовки игровых объектов.
+    """
 
     def __init__(self, body_color=None):
         self.position = ((SCREEN_WIDTH // 2), (SCREEN_HEIGHT // 2))
         self.body_color = body_color
 
     def draw(self):
+        """Метод для отрисовки объектов."""
         pass
 
 
 class Apple(GameObject):
-    '''Класс, описывающий яблоко и действия с ним.'''
+    """Класс, описывающий яблоко и действия с ним."""
 
     def __init__(self):
         super().__init__(body_color=APPLE_COLOR)
         self.randomize_position()
-                
-        # Устанавливаем случайную позицию яблока.
+
     def randomize_position(self):
+        """Устанавливаем случайную позицию яблока."""
         self.position = (
             randint(0, GRID_WIDTH - 1) * GRID_SIZE,
             randint(0, GRID_HEIGHT - 1) * GRID_SIZE,
         )
         return self.position
 
-        # Задаём цвет яблока.
     def draw(self, surface):
-        rect = pygame.Rect((self.position[0], self.position[1]), (GRID_SIZE, GRID_SIZE))
+        """Задаём цвет яблока."""
+        rect = pygame.Rect((self.position[0], self.position[1]),
+                           (GRID_SIZE, GRID_SIZE))
         pygame.draw.rect(surface, self.body_color, rect)
         pygame.draw.rect(surface, BORDER_COLOR, rect, 2, 4)
 
 
 class Snake(GameObject):
-    '''Тут описывается логика змейки,движение на игровом поле и отрисовка'''
+    """Тут описывается логика змейки,движение на игровом поле и отрисовка"""
 
     # Атрибуты змейки.
     def __init__(self):
@@ -88,14 +93,14 @@ class Snake(GameObject):
         self.next_direction = None
         self.last = None
 
-    # Обновляет направление движения змейки.
     def update_direction(self):
+        """Обновляет направление движения змейки."""
         if self.next_direction:
             self.direction = self.next_direction
             self.next_direction = None
 
-    # Обновляет позицию змейки и логика прохождения змейки через стены.
     def move(self):
+        """Обновляет позицию змейки и логика прохождения змейки через стены."""
         head_x, head_y = self.get_head_position()
         dx, dy = self.direction
 
@@ -117,11 +122,10 @@ class Snake(GameObject):
         self.positions.insert(0, new_point)
 
         if len(self.positions) > self.length:
-
             self.last = self.positions.pop()
 
-    # Метод draw класса Snake
     def draw(self, surface):
+        """Метод draw класса Snake"""
         for position in self.positions[:-1]:
             rect = pygame.Rect(position[0], position[1], GRID_SIZE, GRID_SIZE)
             pygame.draw.rect(surface, self.body_color, rect)
@@ -139,20 +143,21 @@ class Snake(GameObject):
             )
             pygame.draw.rect(surface, BOARD_BACKGROUND_COLOR, last_rect)
 
-    # Возвращает позицию головы змейки.
     def get_head_position(self):
+        """Возвращает позицию головы змейки."""
         return self.positions[0]
-    
-    # Сбрасывает змейку в начальное состояние после столкновения.
+
     def reset(self):
+        """Сбрасывает змейку в начальное состояние после столкновения."""
         self.length = 1
         self.positions = [(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2)]
         self.direction = choice([UP, DOWN, LEFT, RIGHT])
         self.next_direction = None
         screen.fill(BOARD_BACKGROUND_COLOR)
 
-# Логика подключения клавиатуры.
+
 def handle_keys(game_object):
+    """Логика подключения клавиатуры."""
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             pygame.quit()
@@ -167,15 +172,16 @@ def handle_keys(game_object):
             elif event.key == pygame.K_RIGHT and game_object.direction != LEFT:
                 game_object.next_direction = RIGHT
 
-# Отрисовка яблока.
+
 def draw_apple():
+    """Отрисовка яблока."""
     apple = Apple()
     apple.draw(screen)
     return apple
 
-# Основная логика игры Змейка.
-def main():
 
+def main():
+    """Основная логика игры Змейка."""
     apple = draw_apple()
 
     snake = Snake()
