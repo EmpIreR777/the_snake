@@ -224,8 +224,7 @@ def main():
         handle_keys(snake)
         snake.update_direction()
         snake.move()
-        
-        
+
         for i in stones:
             if i.position == snake.get_head_position():
                 SPEED = 7
