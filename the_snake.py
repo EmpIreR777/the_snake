@@ -1,5 +1,5 @@
-from random import choice, randint
 import sys
+from random import choice, randint
 
 import pygame as pg
 
@@ -50,11 +50,11 @@ clock = pg.time.Clock()
 class GameObject:
     """Базовый класс. Cодержит общие атрибуты и метод отрисовки."""
 
-    def __init__(self, body_color=None, position=None):
-        self.position = CENTRE_POINT
+    def __init__(self, body_color=None, position=CENTRE_POINT):
+        self.position = position
         self.body_color = body_color
 
-    def randomize_position(self, boom):
+    def randomize_position(self, boom=[CENTRE_POINT]):
         """Устанавливаем случайную значение яблоку и стенке."""
         self.position = (
             randint(0, GRID_WIDTH - 1) * GRID_SIZE,
@@ -71,11 +71,12 @@ class GameObject:
         raise NotImplementedError('Определите draw в %s.'
                                   % (self.__class__.__name__))
 
-    def rect(self, surface, position, border_color=None, border_width=1):
+    def rect(self, surface, position, border_color=BORDER_COLOR,
+             border_width=1, frame_loading=1):
         """Задаём цвет камня и яблока."""
         rect = pg.Rect((position[0], position[1]), (GRID_SIZE, GRID_SIZE))
         pg.draw.rect(surface, self.body_color, rect)
-        pg.draw.rect(surface, border_color, rect, border_width, 5)
+        pg.draw.rect(surface, border_color, rect, border_width, frame_loading)
         return rect
 
 
@@ -88,7 +89,7 @@ class Stone(GameObject):
 
     def draw(self, surface):
         """Отрисовка Камня."""
-        self.rect(surface, self.position, BORDER_COLOR, 1)
+        self.rect(surface, self.position, 1)
 
 
 class Apple(GameObject):
@@ -100,14 +101,14 @@ class Apple(GameObject):
 
     def draw(self, surface):
         """Отрисовка Яблока."""
-        self.rect(surface, self.position, BORDER_COLOR, 2)
+        self.rect(surface, self.position, BORDER_COLOR, 2, 4)
 
 
 class Snake(GameObject):
     """Тут описывается логика змейки,движение на игровом поле и отрисовка."""
 
     def __init__(self):
-        super().__init__(body_color=SNAKE_COLOR, position=None)
+        super().__init__(body_color=SNAKE_COLOR)
         self.reset()
         self.direction = RIGHT
         self.positions = [self.position]
@@ -148,15 +149,11 @@ class Snake(GameObject):
             self.rect(surface, position, BOARD_BACKGROUND_COLOR, 3)
 
         # Отрисовка головы змейки
-        head_rect = pg.Rect(self.positions[0], (GRID_SIZE, GRID_SIZE))
-        pg.draw.rect(surface, self.body_color, head_rect)
-        pg.draw.rect(surface, BORDER_COLOR, head_rect, 1, 1)
+        self.rect(surface, self.positions[0], BORDER_COLOR, 1, 1)
 
         # Затирание последнего сегмента
         if self.last:
-            last_rect = pg.Rect((self.last[0], self.last[1]),
-                                (GRID_SIZE, GRID_SIZE))
-            pg.draw.rect(surface, BOARD_BACKGROUND_COLOR, last_rect)
+            self.rect(surface, self.last, BOARD_BACKGROUND_COLOR, 10, 1)
 
     def get_head_position(self):
         """Возвращает позицию головы змейки."""
