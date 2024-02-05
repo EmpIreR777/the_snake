@@ -56,11 +56,7 @@ class GameObject:
 
     def randomize_position(self, boom=[CENTRE_POINT]):
         """Устанавливаем случайную значение яблоку и стенке."""
-        self.position = (
-            randint(0, GRID_WIDTH - 1) * GRID_SIZE,
-            randint(0, GRID_HEIGHT - 1) * GRID_SIZE,
-        )
-        while self.position in boom:
+        while self.position is None or self.position in boom:
             self.position = (
                 (randint(0, GRID_WIDTH - 1) * GRID_SIZE),
                 (randint(0, GRID_HEIGHT - 1) * GRID_SIZE),
@@ -68,8 +64,8 @@ class GameObject:
 
     def draw(self, surface):
         """Метод для отрисовки объектов."""
-        raise NotImplementedError('Определите draw в %s.'
-                                  % (self.__class__.__name__))
+        raise NotImplementedError(f'Определите draw в \
+                                  {self.__class__.__name__}.')
 
     def rect(self, surface, position, border_color=BORDER_COLOR,
              border_width=1, frame_loading=1):
@@ -89,7 +85,7 @@ class Stone(GameObject):
 
     def draw(self, surface):
         """Отрисовка Камня."""
-        self.rect(surface, self.position, 1)
+        self.rect(surface, self.position, border_width=1)
 
 
 class Apple(GameObject):
