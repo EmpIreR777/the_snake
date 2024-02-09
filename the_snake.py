@@ -120,17 +120,8 @@ class Snake(GameObject):
         head_x, head_y = self.get_head_position()
 
         dx, dy = self.direction
-        new_x = head_x + dx * GRID_SIZE
-        new_y = head_y + dy * GRID_SIZE
-
-        if new_x == SCREEN_WIDTH:
-            new_x = -GRID_SIZE
-        elif new_x == -GRID_SIZE:
-            new_x = SCREEN_WIDTH - GRID_SIZE
-        if new_y == SCREEN_HEIGHT:
-            new_y = -GRID_SIZE
-        elif new_y == -GRID_SIZE:
-            new_y = SCREEN_HEIGHT - GRID_SIZE
+        new_x = (head_x + dx * GRID_SIZE) % SCREEN_WIDTH
+        new_y = (head_y + dy * GRID_SIZE) % SCREEN_HEIGHT
 
         new_point = (new_x, new_y)
 
